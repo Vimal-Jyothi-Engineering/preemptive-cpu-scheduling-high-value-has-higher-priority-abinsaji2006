@@ -21,12 +21,14 @@ int main() {
     int n = 0;
     char first[20];
 
-    if(scanf("%s", first) != 1) return 0;
+    if(scanf("%s", first) != 1)
+        return 0;
 
     if(first[0] >= '0' && first[0] <= '9') {
+
         int count = atoi(first);
 
-        for(int i=0;i<count;i++) {
+        for(int i = 0; i < count; i++) {
             scanf("%s %d %d %d",
                   p[n].name,
                   &p[n].arrival,
@@ -38,7 +40,9 @@ int main() {
         }
     }
     else {
+
         strcpy(p[n].name, first);
+
         scanf("%d %d %d",
               &p[n].arrival,
               &p[n].burst,
@@ -48,35 +52,43 @@ int main() {
         n++;
 
         while(scanf("%s %d %d %d",
-              p[n].name,
-              &p[n].arrival,
-              &p[n].burst,
-              &p[n].priority) == 4) {
+                    p[n].name,
+                    &p[n].arrival,
+                    &p[n].burst,
+                    &p[n].priority) == 4) {
 
             p[n].remaining = p[n].burst;
             n++;
         }
     }
 
-    int finished[MAX] = {0};
-    int completed = 0;
     int time = 0;
+    int completed = 0;
+    int done[MAX] = {0};
+
+    int min_arrival = p[0].arrival;
+    for(int i = 1; i < n; i++)
+        if(p[i].arrival < min_arrival)
+            min_arrival = p[i].arrival;
+
+    time = min_arrival;
 
     while(completed < n) {
 
         int idx = -1;
         int best_priority = -1;
 
-        for(int i=0;i<n;i++) {
+        for(int i = 0; i < n; i++) {
 
-            if(!finished[i] && p[i].arrival <= time) {
+            if(!done[i] && p[i].arrival <= time) {
 
                 if(p[i].priority > best_priority) {
                     best_priority = p[i].priority;
                     idx = i;
                 }
                 else if(p[i].priority == best_priority) {
-                    if(p[i].arrival < p[idx].arrival)
+
+                    if(idx == -1 || p[i].arrival < p[idx].arrival)
                         idx = i;
                 }
             }
@@ -84,46 +96,45 @@ int main() {
 
         if(idx == -1) {
             time++;
+            continue;
         }
-        else {
 
-            p[idx].remaining--;
-            time++;
+        p[idx].remaining--;
+        time++;
 
-            if(p[idx].remaining == 0) {
+        if(p[idx].remaining == 0) {
 
-                p[idx].finish = time;
+            p[idx].finish = time;
 
-                p[idx].turnaround =
-                    p[idx].finish - p[idx].arrival;
+            p[idx].turnaround =
+                p[idx].finish - p[idx].arrival;
 
-                p[idx].waiting =
-                    p[idx].turnaround - p[idx].burst;
+            p[idx].waiting =
+                p[idx].turnaround - p[idx].burst;
 
-                finished[idx] = 1;
-                completed++;
-            }
+            done[idx] = 1;
+            completed++;
         }
     }
 
     printf("Waiting Time:\n");
-    for(int i=0;i<n;i++)
+    for(int i = 0; i < n; i++)
         printf("%s %d\n", p[i].name, p[i].waiting);
 
     printf("Turnaround Time:\n");
-    for(int i=0;i<n;i++)
+    for(int i = 0; i < n; i++)
         printf("%s %d\n", p[i].name, p[i].turnaround);
 
-    double total_wt = 0;
-    double total_tat = 0;
+    double total_w = 0;
+    double total_t = 0;
 
-    for(int i=0;i<n;i++) {
-        total_wt += p[i].waiting;
-        total_tat += p[i].turnaround;
+    for(int i = 0; i < n; i++) {
+        total_w += p[i].waiting;
+        total_t += p[i].turnaround;
     }
 
-    printf("Average Waiting Time: %.2f\n", total_wt/n);
-    printf("Average Turnaround Time: %.2f\n", total_tat/n);
+    printf("Average Waiting Time: %.2f\n", total_w / n);
+    printf("Average Turnaround Time: %.2f\n", total_t / n);
 
     return 0;
 }
