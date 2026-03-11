@@ -7,7 +7,7 @@ priority: priority.c
 	$(CC) $(CFLAGS) -o priority priority.c
 
 test: priority
-	@./priority
+	./priority
 
 clean:
 	rm -f priority
