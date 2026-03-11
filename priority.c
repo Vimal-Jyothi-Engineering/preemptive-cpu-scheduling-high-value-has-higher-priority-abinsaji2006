@@ -21,14 +21,16 @@ int main() {
     int n = 0;
     char first[20];
 
-    if(scanf("%s", first) != 1) return 0;
+    if(scanf("%s", first) != 1)
+        return 0;
 
-    /* Check if first input is number */
+    /* Check if first input is number of processes */
     if(first[0] >= '0' && first[0] <= '9') {
 
         int count = atoi(first);
 
         for(int i=0;i<count;i++) {
+
             scanf("%s %d %d %d",
                   p[n].name,
                   &p[n].arrival,
@@ -51,20 +53,21 @@ int main() {
         n++;
 
         while(scanf("%s %d %d %d",
-              p[n].name,
-              &p[n].arrival,
-              &p[n].burst,
-              &p[n].priority) == 4) {
+                    p[n].name,
+                    &p[n].arrival,
+                    &p[n].burst,
+                    &p[n].priority) == 4) {
 
             p[n].remaining = p[n].burst;
             n++;
         }
     }
 
-    int time = 0;
     int completed = 0;
+    int time = 0;
     int done[MAX] = {0};
 
+    /* Start time from earliest arrival */
     int min_arrival = p[0].arrival;
     for(int i=1;i<n;i++)
         if(p[i].arrival < min_arrival)
@@ -75,18 +78,19 @@ int main() {
     while(completed < n) {
 
         int idx = -1;
-        int best = -1;
+        int best_priority = -1;
 
         for(int i=0;i<n;i++) {
 
             if(!done[i] && p[i].arrival <= time) {
 
-                if(p[i].priority > best) {
-                    best = p[i].priority;
+                if(p[i].priority > best_priority) {
+                    best_priority = p[i].priority;
                     idx = i;
                 }
-                else if(p[i].priority == best) {
-                    if(idx == -1 || p[i].arrival < p[idx].arrival)
+                else if(p[i].priority == best_priority) {
+
+                    if(p[i].arrival < p[idx].arrival)
                         idx = i;
                 }
             }
@@ -97,7 +101,7 @@ int main() {
             continue;
         }
 
-        /* Preemptive execution */
+        /* run process for 1 time unit (preemptive) */
         p[idx].remaining--;
         time++;
 
@@ -124,7 +128,8 @@ int main() {
     for(int i=0;i<n;i++)
         printf("%s %d\n", p[i].name, p[i].turnaround);
 
-    double total_w = 0, total_t = 0;
+    double total_w = 0;
+    double total_t = 0;
 
     for(int i=0;i<n;i++) {
         total_w += p[i].waiting;
