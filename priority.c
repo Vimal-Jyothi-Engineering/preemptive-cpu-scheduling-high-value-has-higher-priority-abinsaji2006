@@ -20,7 +20,7 @@ int main(void) {
     int n = 0;
     char buf[256];
 
-    /* Flexible Input Parsing */
+    // Flexible Input Parsing
     if (scanf("%s", buf) != 1) return 0;
 
     if (buf[0] >= '0' && buf[0] <= '9') {
@@ -30,9 +30,8 @@ int main(void) {
             procs[i].remaining = procs[i].burst;
         }
     } else {
-        /* No count provided; handle first process from buf then loop */
         int arr, bur, pri;
-        while (1) {
+        do {
             if (scanf("%d %d %d", &arr, &bur, &pri) == 3) {
                 strcpy(procs[n].name, buf);
                 procs[n].arrival = arr;
@@ -41,29 +40,28 @@ int main(void) {
                 procs[n].remaining = bur;
                 n++;
             }
-            if (scanf("%s", buf) != 1) break;
-        }
+        } while (scanf("%s", buf) == 1);
     }
 
     if (n == 0) return 0;
 
-    /* Preemptive Priority Scheduling Logic */
-    int done = 0;
-    int time = 0;
+    int done = 0, time = 0;
     int finished[MAX_PROC] = {0};
 
+    // Core Scheduling Loop
     while (done < n) {
         int idx = -1;
         int highest_prio = -1;
 
         for (int i = 0; i < n; i++) {
             if (procs[i].arrival <= time && !finished[i]) {
-                // Higher priority number = Higher priority
-                // Tie-breaker: Earlier arrival time
+                // Higher number = Higher Priority
                 if (procs[i].priority > highest_prio) {
                     highest_prio = procs[i].priority;
                     idx = i;
-                } else if (procs[i].priority == highest_prio) {
+                } 
+                // Tie-breaker: Earlier arrival time
+                else if (procs[i].priority == highest_prio) {
                     if (procs[i].arrival < procs[idx].arrival) {
                         idx = i;
                     }
@@ -74,7 +72,6 @@ int main(void) {
         if (idx != -1) {
             procs[idx].remaining--;
             time++;
-
             if (procs[idx].remaining == 0) {
                 procs[idx].finish = time;
                 procs[idx].turnaround = procs[idx].finish - procs[idx].arrival;
@@ -83,21 +80,13 @@ int main(void) {
                 done++;
             }
         } else {
-            // No process ready, advance clock to the next arrival
-            int next_val = 1e9;
-            for(int i = 0; i < n; i++) {
-                if(!finished[i] && procs[i].arrival > time) {
-                    if(procs[i].arrival < next_val) next_val = procs[i].arrival;
-                }
-            }
-            time = (next_val == 1e9) ? time + 1 : next_val;
+            time++; // CPU Idle
         }
     }
 
-    /* Output Results */
+    // Output
     printf("Waiting Time:\n");
     for (int i = 0; i < n; i++) printf("%s %d\n", procs[i].name, procs[i].waiting);
-
     printf("Turnaround Time:\n");
     for (int i = 0; i < n; i++) printf("%s %d\n", procs[i].name, procs[i].turnaround);
 
