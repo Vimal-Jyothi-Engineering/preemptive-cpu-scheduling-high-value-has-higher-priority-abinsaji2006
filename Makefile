@@ -1,10 +1,13 @@
 CC = gcc
+CFLAGS = -Wall -Wextra
+
+all: priority
 
 priority: priority.c
-	$(CC) priority.c -o priority
+	$(CC) $(CFLAGS) -o priority priority.c
 
 test: priority
-	./priority
+	@./priority
 
 clean:
 	rm -f priority
